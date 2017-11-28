@@ -56,9 +56,18 @@ document.addEventListener("Bounce", function() {
 	bounce.play();
 });
 
+document.onkeypress = function() {
+	if (gameOver === true) {
+		modal.style.display = "none";
+    	document.location.reload();
+	}
+};
+
 window.onclick = function() {
-    modal.style.display = "none";
-    document.location.reload();
+    if (gameOver === true) {
+		modal.style.display = "none";
+    	document.location.reload();
+	}
 };
 
 var bEvent = new CustomEvent("Bounce");
@@ -130,7 +139,7 @@ function draw() {
 	    if (totalScore >= 30) {
 	    	ball3.drawBall();
 	    }
-	    if (totalScore >= 60) {
+	    if (totalScore >= 70) {
 	    	ball4.drawBall();
 	    }
 	    drawPaddle();
