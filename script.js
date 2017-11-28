@@ -13,6 +13,7 @@ var leftPressed = false;
 var ballRadius = 14;
 var totalScore = 0;
 var bounce = new Audio('Sound/bounce.mp3');
+var voiceGameOver = new Audio('Sound/GameOver.mp3');
 var modal = document.getElementById('myModal');
 var gameOver = false;
 
@@ -101,6 +102,7 @@ var Ball = {
 		    else {
 		        modal.style.display = "block";
 		        gameOver = true;
+		        voiceGameOver.play();
 		    }
 		}
 
