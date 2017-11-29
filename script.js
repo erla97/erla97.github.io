@@ -49,6 +49,10 @@ function mouseMoveHandler(e) {
     }
 }
 
+//skilgreint hljóðstyrkur
+bounce.volume = 0.1;
+voiceGameOver.volume = 0.1;
+
 document.addEventListener("Bounce", function() {
 	if (!bounce.ended) {
 		bounce.pause();
@@ -124,6 +128,7 @@ var ball1 = Ball.create(2, -5);
 var ball2 = Ball.create(3, 4);
 var ball3 = Ball.create(-3, -3);
 var ball4 = Ball.create(4, 2);
+var ball5 = Ball.create(2, 2);
 
 function drawPaddle() {
     ctx.beginPath();
@@ -143,6 +148,9 @@ function draw() {
 	    }
 	    if (totalScore >= 70) {
 	    	ball4.drawBall();
+	    }
+	    if (totalScore >= 100) {
+	    	ball5.drawBall();
 	    }
 	    drawPaddle();
 	}
