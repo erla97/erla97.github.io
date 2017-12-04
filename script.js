@@ -17,11 +17,17 @@ var gameOver = false;
 var powerX = Math.floor(Math.random() * 450 + 25);
 var powerY = 0;
 var power = false;
+var totalSeconds = 0;
 
 //Hljóð
 var bounce = new Audio('Sound/bounce.mp3');
 var voiceGameOver = new Audio('Sound/GameOver.mp3');
 var sPowerUp = new Audio('Sound/PowerUp.wav');
+
+//skilgreint hljóðstyrk
+bounce.volume = 0.1;
+voiceGameOver.volume = 0.1;
+sPowerUp.volume = 0.1;
 
 //Fylki sem inniheldur liti
 var colors = ["#3498db", "#9b59b6", "#f1c40f", "#e67e22", "#2ecc71", "#f39c12", "#1abc9c",];
@@ -58,10 +64,6 @@ function mouseMoveHandler(e) {
         paddleX = relativeX - paddleWidth/2;
     }
 }
-
-//skilgreint hljóðstyrk
-bounce.volume = 0.1;
-voiceGameOver.volume = 0.1;
 
 //Bý til Event Listener fyrir Bounce hljóðið
 document.addEventListener("Bounce", function() {
@@ -100,27 +102,32 @@ var Ball = {
 		var newBall = Object.create(this); //býr til bolta(object)
 		newBall.x = Math.floor(Math.random() * 450 + 25); //Random x gildi
 		newBall.y = Math.floor(Math.random() * 250 + 25); //Random y gildi
-		newBall.dx = bdx; //tekur inn færibreytu hér, bdx
-		newBall.dy = bdy; //tekur inn færibreytu hér, bdy
+		newBall.dx = bdx; //tekur inn færibreytu hér, bdx.
+		newBall.dy = bdy; //tekur inn færibreytu hér, bdy.
 		var i = Math.floor(Math.random() * 7); //i fær random gildi, 0-7
 		newBall.color = colors[i]; //hver bolti fær random lit úr colors fylkinu
 		return newBall; //Fallið skilar síðan frá sér boltanum sem það bjó til
 	},
 	//Fall sem finnur út hvort að bolti hafi hitt á vegg, rauðu línuna eða á paddle-inn
 	collision: function () {
+		//Ef að bolti hittir hægri eða vinstri hlið á canvas skýst hann til baka
 		if(this.x + this.dx > canvas.width-ballRadius || this.x + this.dx < ballRadius) {
 	        this.dx = -this.dx;
 	    }
+	    //Ef bolti hittir "loftið" á canvas skýst hann til baka
 	    if(this.y + this.dy < ballRadius) {
 	        this.dy = -this.dy;
-	    } 
+	    }
+	    //Ef bolti fer að hitta botn/hittir botn..
 		else if(this.y - 5 + this.dy > canvas.height-ballRadius) {
+			//Ef bolti hittir paddle-inn rétt áður en hann hittir botninn skýst hann til baka
 		    if(this.x > paddleX - 10 && this.x < paddleX + paddleWidth + 10) {
-		        this.dy = -this.dy; 
+		        this.dy = -this.dy;
 		        totalScore = totalScore + 5; //Í hver skipti sem notandi bjargar bolta bætast 5 stig við heildarstigin
 		        document.getElementById("score").innerHTML = "Score: " + totalScore; //Hérna er skrifað stigin svo að notandi getur séð þau
 		        document.dispatchEvent(bEvent); //Þegar bolti hittir á paddle-inn spilast bounce hljóð
 		    }
+		    //annars ef bolti hittir ekki paddle-inn er leiknum lokið
 		    else {
 		        modal.style.display = "block"; //GameOver modal birtist þegar bolti hittir rauðu línuna
 		        gameOver = true;
@@ -128,6 +135,7 @@ var Ball = {
 		    }
 		}
 
+		//x og y bætir við sig gildum dx og dy
 		this.x += this.dx;
     	this.y += this.dy;
 	},
@@ -167,12 +175,12 @@ function drawPaddle() {
     ctx.closePath();
 }
 
-var totalSeconds = 0;
-setInterval(setTime, 1000);
+setInterval(setTime, 1000); //setTime gerist á hverri 1000ms.
 
 function setTime()
 {
-    ++totalSeconds;
+    ++totalSeconds; //totalSeconds bætir við einum á hverri sek.
+    //Ef að totalSeconds verður 7, breytist breiddin á paddle í venjulega stærð
     if (totalSeconds == 7) {
     	paddleWidth = 90;
     }
@@ -185,13 +193,14 @@ function draw() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height); //Hreinsað er canvasinn áður en allt er teiknað aftur
 	    ball1.drawBall(); //Teiknað fyrsta boltann
 	    ball2.drawBall(); //Teiknað annan bolta
+	    //Ef að totalScore er deilt með 50 hefur engan afgang eða totalScore er ekki 0
 	    if (totalScore % 50 === 0 && totalScore !== 0) {
 	    	powerY = 0;
 	    	power = true;
 	    }
 	    if (power === true) {
-	    	drawPowerUp();
-	    	powerY += 5;
+	    	drawPowerUp(); //Teiknað PowerUp
+	    	powerY += 5; //Til þess að PowerUp færist, bætist við Y gildið 5 í hvert skipti
 		}
 		//Teikað er þriðja boltann ef að stigin er 30+
 	    if (totalScore >= 30) {
@@ -216,16 +225,19 @@ function draw() {
 	    paddleX -= 15;
 	}
 
+	//Ef að PowerUp er komið út fyrir canvas hverfur það
 	if (powerY > 505) {
 		power = false;
 	}
+	//Ef að PowerUp fer að hitta botn/hittir botn
 	else if(powerY > canvas.height - paddleHeight && power === true) {
+		//Annars ef að PowerUp hittir á paddle-inn..
 		if(powerX > paddleX - 10 && powerX < paddleX + paddleWidth + 10) {
-	        sPowerUp.play();
-	        paddleWidth = 130;
-	        totalSeconds = 0;
-	        power = false;
-	        powerX = Math.floor(Math.random() * 450 + 25);
+	        sPowerUp.play(); //Spilast PowerUp hljóð
+	        paddleWidth = 130; //Breiddin á paddle stækkar
+	        totalSeconds = 0; //Tíminn byrjar upp á nýtt
+	        power = false; //PoerUp kassinn hverfur
+	        powerX = Math.floor(Math.random() * 450 + 25); //Random x-gildi fyrir næsta PowerUp fundið
 	    }
 	}
 }
